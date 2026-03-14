@@ -26,7 +26,7 @@ export default function HomePage() {
 
   fetchUsers(token!)
     .then((data) => {
-      setProducts(data)})
+      setProducts(data.content())})
     .catch(() => {
       fetch("/api/v1/auth/refreshtoken", {
         method: "POST",
@@ -45,7 +45,7 @@ export default function HomePage() {
         }
       })
       .then(data => {
-        setProducts(data)})
+        setProducts(data.content())})
       .catch(err => console.error("Refresh or fetch failed:", err));
     });
 }, []);

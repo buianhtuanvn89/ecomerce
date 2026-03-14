@@ -1,4 +1,3 @@
-import CategorySidebar from "@/app/component/CategorySidebar";
 import SidebarFilter from "@/app/component/SidebarFilter";
 
 type Props = {
@@ -14,8 +13,8 @@ async function getProducts(params: string) {
       cache: "no-store",
     }
   );
-
-  return res.json();
+  const data = await res.json();
+  return data.content;
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -33,9 +32,8 @@ export default async function SearchPage({ searchParams }: Props) {
     });
 
   const query = params.toString();
-
   const products = await getProducts(query);
-
+ 
   return (
     <div>
       <SidebarFilter/>

@@ -1,4 +1,6 @@
+import ProductPagination from "@/app/component/ProductPagination"
 import SidebarFilter from "@/app/component/SidebarFilter"
+import SortDropdown from "@/app/component/SortDropdown"
 
 type Props = {
    params: {
@@ -24,8 +26,9 @@ async function getProducts(params: String) {
 }
 
 export default async function Page({params, searchParams }: Props) {
+  const { categoryId } = await params;
   const queryParams  = new URLSearchParams();
-    const paramsObj = await searchParams;
+  const paramsObj = await searchParams;
 
     Object.entries(paramsObj).forEach(([key, value]) => {
 
@@ -36,22 +39,29 @@ export default async function Page({params, searchParams }: Props) {
       }
 
     });
-  queryParams.append("categoryId", params.categoryId);
+  queryParams.append("categoryId", categoryId);
   const query = queryParams .toString();
-
-  const products = await getProducts(query);
+  const productsPage = await getProducts(query);
+  const products = productsPage.content;
 
   return (
     <div>
       <SidebarFilter/>
+      <SortDropdown/>
       <h1>Product List</h1>
 
       {products.map((p: any) => (
         <div key={p.id}>
-          <p>{p.productName}</p>
-          <p>{p.price}</p>
+          <p>Name: {p.productName}</p>
+          <p>Price: {p.price}</p>
         </div>
       ))}
+
+       <ProductPagination
+        totalElement={productsPage.totalElements}
+        size={productsPage.size}
+        page={productsPage.number}
+      />
     </div>
   )
 }
