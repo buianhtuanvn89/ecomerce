@@ -39,6 +39,7 @@ export default async function Page({params, searchParams }: Props) {
       }
 
     });
+    
   queryParams.append("categoryId", categoryId);
   const query = queryParams .toString();
   const productsPage = await getProducts(query);
