@@ -17,42 +17,91 @@ interface AuthCardContextType {
   setUser: (user: UserInfo | null) => void;
   logout: () => void;
   cart : CartInfo[];
-  addToCart : (productId: number) => void;
+  setCart : (cart: CartInfo[]) => void;
+  addToCart : (id: number) => void;
 }
 
 const AuthCardContext = createContext<AuthCardContextType | undefined>(undefined);
 
 export const AuthCardProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartInfo[]>([]);
+
+  const addCartItem = async (productId:number) =>{
+    await fetch(`/api/v1/carts?userName=${user?.userName}`,{
+      method:"POST",
+      headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          {
+            items:[
+              {
+                productId,
+                quantity:1,
+              } 
+            ]  
+          }
+        ),   
+    })
+  }
+
+  const removeCartItem = async (productId:number) =>{
+    await fetch(`/api/v1/carts?userName=${user?.userName}&remove=true`,{
+      method:"POST",
+      headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          {
+            productId,
+            quantity:1,
+          }
+        ),   
+    })
+  }
+
+  const getCart = async (userName : string) => {
+    const res = await fetch(`/api/v1/carts?userName=${userName}`)
+    const localCart = await res.json();
+    setCart(localCart);
+  }
+
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        const localCart = localStorage.getItem("cart");
+        if (localCart) {
+          setCart(JSON.parse(localCart));
+        }
+      } else {
+        getCart(JSON.parse(storedUser).userName);
+        setUser(JSON.parse(storedUser));
+      }
   }, []);
 
-  useEffect(() => {
-      const localCart = localStorage.getItem("cart");
-      if (localCart) {
-        setCart(JSON.parse(localCart));
-      }
-    }, []);
-
-   const addToCart = (productId: number) => {
+   const addToCart = (id: number) => {
     const newCart = [...cart];
-    const index = newCart.findIndex(i => i.productId === productId);
+    const index = newCart.findIndex(i => i.productId === id);
 
     if (index >= 0) {
-      const updateCart = newCart.filter(i => i.productId !== productId);
+      const updateCart = newCart.filter(i => i.productId !== id);
       setCart(updateCart);
+      if (!user) 
+        {localStorage.setItem("cart", JSON.stringify(newCart))}
+        else {
+          removeCartItem(id);
+        }
     } else {
-      newCart.push({ productId, quantity: 1 });
+      newCart.push({ productId:id, quantity: 1 });
       setCart(newCart);
+      if (!user) 
+        {localStorage.setItem("cart", JSON.stringify(newCart))}
+        else {
+          addCartItem(id);
+        }
     }
-
-    localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
   const logout = () => {
@@ -63,7 +112,7 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   return (
-    <AuthCardContext.Provider value={{ user, setUser, logout, cart, addToCart }}>
+    <AuthCardContext.Provider value={{ user, setUser, logout, cart, addToCart, setCart }}>
       {children}
     </AuthCardContext.Provider>
   );

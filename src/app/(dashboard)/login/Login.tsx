@@ -8,12 +8,35 @@ interface LoginProps {
 }
 
 export default function Login({ onClose }: LoginProps) {
-  const { setUser } = useAuthCard();
+  const { setUser, cart, setCart } = useAuthCard();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const pushAndGetCart = async (userName : string) =>{
+    if (cart.length !=0 ) {
+      await fetch(`/api/v1/carts?userName=${userName}`,{
+        method:"POST",
+        headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(
+            {
+              items:cart,
+            }
+          ),   
+      })
+      localStorage.removeItem("cart");
+    }
+
+    const getRes = await fetch(`/api/v1/carts?userName=${userName}`);
+    if (getRes.ok) {
+      const localCart = await getRes.json();
+      setCart(localCart);
+    }
+  }
 
   const handleLogin = async () => {
     try {
@@ -50,11 +73,12 @@ export default function Login({ onClose }: LoginProps) {
 
       // 🔥 Update context
       setUser(userInfo);
+      pushAndGetCart(result.data.userName);
 
       // 🔥 Đóng modal
       // onClose();
       window.location.reload();
-
+    
     } catch (err: any) {
       setError(err.message);
     } finally {
