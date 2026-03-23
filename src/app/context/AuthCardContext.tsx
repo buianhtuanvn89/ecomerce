@@ -19,6 +19,8 @@ interface AuthCardContextType {
   cart : CartInfo[];
   setCart : (cart: CartInfo[]) => void;
   addToCart : (id: number) => void;
+  addCartItem : (productId:number) => void;
+  removeCartItem: (productId:number, removeType:boolean) => void;
 }
 
 const AuthCardContext = createContext<AuthCardContextType | undefined>(undefined);
@@ -28,7 +30,7 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
   const [cart, setCart] = useState<CartInfo[]>([]);
 
   const addCartItem = async (productId:number) =>{
-    await fetch(`/api/v1/carts?userName=${user?.userName}`,{
+    await fetch(`/api/v1/carts/add?userName=${user?.userName}`,{
       method:"POST",
       headers: {
           "Content-Type": "application/json",
@@ -46,8 +48,8 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
     })
   }
 
-  const removeCartItem = async (productId:number) =>{
-    await fetch(`/api/v1/carts?userName=${user?.userName}&remove=true`,{
+  const removeCartItem = async (productId:number, removeType:boolean) =>{
+    await fetch(`/api/v1/carts/remove?userName=${user?.userName}&remove=${removeType}`,{
       method:"POST",
       headers: {
           "Content-Type": "application/json",
@@ -89,9 +91,9 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
       const updateCart = newCart.filter(i => i.productId !== id);
       setCart(updateCart);
       if (!user) 
-        {localStorage.setItem("cart", JSON.stringify(newCart))}
+        {localStorage.setItem("cart", JSON.stringify(updateCart))}
         else {
-          removeCartItem(id);
+          removeCartItem(id,true);
         }
     } else {
       newCart.push({ productId:id, quantity: 1 });
@@ -109,10 +111,11 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setUser(null);
+    setCart([]);
   };
 
   return (
-    <AuthCardContext.Provider value={{ user, setUser, logout, cart, addToCart, setCart }}>
+    <AuthCardContext.Provider value={{ user, setUser, logout, cart, addToCart, setCart, addCartItem, removeCartItem }}>
       {children}
     </AuthCardContext.Provider>
   );

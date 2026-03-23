@@ -6,7 +6,7 @@ import { useAuthCard } from "@/app/context/AuthCardContext";
 interface LoginProps {
   onClose: () => void;
 }
-
+ 
 export default function Login({ onClose }: LoginProps) {
   const { setUser, cart, setCart } = useAuthCard();
 
@@ -17,7 +17,7 @@ export default function Login({ onClose }: LoginProps) {
 
   const pushAndGetCart = async (userName : string) =>{
     if (cart.length !=0 ) {
-      await fetch(`/api/v1/carts?userName=${userName}`,{
+      await fetch(`/api/v1/carts/add?userName=${userName}`,{
         method:"POST",
         headers: {
             "Content-Type": "application/json",
@@ -29,6 +29,7 @@ export default function Login({ onClose }: LoginProps) {
           ),   
       })
       localStorage.removeItem("cart");
+      console.log("da xoa cart")
     }
 
     const getRes = await fetch(`/api/v1/carts?userName=${userName}`);
@@ -76,8 +77,8 @@ export default function Login({ onClose }: LoginProps) {
       pushAndGetCart(result.data.userName);
 
       // 🔥 Đóng modal
-      // onClose();
-      window.location.reload();
+      onClose();
+      // window.location.reload();
     
     } catch (err: any) {
       setError(err.message);
