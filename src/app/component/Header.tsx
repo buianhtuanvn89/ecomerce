@@ -17,7 +17,7 @@ export default function Header() {
   const handleLogOut = () => {
     setOpen(false);
     logout();
-    router.push("/");
+    // router.push("/");
   }
 
   return (

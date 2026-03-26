@@ -121,7 +121,7 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
   );
 };
 
-export const useAuthCard = () => {
+export const useAuthCard = (): AuthCardContextType  => {
   const context = useContext(AuthCardContext);
   if (!context) throw new Error("useAuth must be used inside AuthProvider");
   return context;

@@ -29,7 +29,7 @@ export default function Login({ onClose }: LoginProps) {
           ),   
       })
       localStorage.removeItem("cart");
-      console.log("da xoa cart")
+
     }
 
     const getRes = await fetch(`/api/v1/carts?userName=${userName}`);
