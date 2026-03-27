@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Login from "../(dashboard)/login/Login";
+import Login from "./Login";
 import { useAuthCard } from "../context/AuthCardContext";
 import { useRouter } from "next/navigation";
 import SearchBar from "./SearchBar";
@@ -17,7 +17,7 @@ export default function Header() {
   const handleLogOut = () => {
     setOpen(false);
     logout();
-    // router.push("/");
+    router.push("/");
   }
 
   return (
