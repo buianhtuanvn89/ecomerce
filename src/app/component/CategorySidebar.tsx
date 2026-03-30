@@ -38,7 +38,7 @@ export default function CategorySidebar() {
           
           {/* category tầng 1 */}
           <Link
-            href={`/product/${parent.id}`}
+            href={`/product/category/${parent.id}`}
             className="text-gray-600 hover:text-black"
           >
             {parent.categoryName}
@@ -51,7 +51,7 @@ export default function CategorySidebar() {
               .map((child) => (
                 <span key={child.id}>
                   <Link
-                    href={`/product/${child.id}`}
+                    href={`/product/category/${child.id}`}
                     className="text-gray-600 hover:text-black"
                   >
                     {child.categoryName}

@@ -92,9 +92,17 @@ export default function CreateProductForm() {
   // =============================
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-    if (!e.target.files) return;
+    const files = e.target.files;
+    if (!files) return;
 
-    setImages(Array.from(e.target.files));
+    setImages(prev => [...prev, ...Array.from(files)]);
+  };
+
+  // =============================
+  // Handle images list
+  // =============================
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   // =============================
@@ -136,10 +144,7 @@ export default function CreateProductForm() {
       alert("Create product failed");
     }
   };
-
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  };
+  
 
   // =============================
   // Render
@@ -299,7 +304,7 @@ export default function CreateProductForm() {
             display: "inline-block"
           }}
         >
-          Chọn ảnh
+          Them ảnh
         </label>
 
         <div style={{ display: "flex", gap: "10px", marginTop: "10px", flexWrap: "wrap" }}>

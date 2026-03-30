@@ -25,6 +25,7 @@ export default function SidebarFilter() {
   return (
     <div>
       <CategorySidebar/>
+      
       <PriceFilter
         selected={searchParams.getAll("prices")}
         onChange={(v) => updateFilter("prices", v)}
