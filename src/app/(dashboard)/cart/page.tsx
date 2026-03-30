@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 
 export default function CartPage() {
 
-  const { user, cart, addCartItem, removeCartItem, setCart } = useAuthCard();
+  const { user, cart, addCartItem, removeCartItem, setCart} = useAuthCard();
+  const [cartDetail, setCartDetail] = useState<any[]>([]);
 
-  const [cartRes, setCartRes] = useState<any[]>([]);
 
   useEffect(() => {
 
     if (cart.length === 0) {
-      setCartRes([]);
+      setCartDetail([]);
       return;
     }
 
@@ -25,18 +25,18 @@ export default function CartPage() {
     })
       .then(res => res.json())
       .then(data => {
-        setCartRes(data);
+        setCartDetail(data);
         console.log("data:",data);
       });
 
   }, [cart]);
 
-  const totalPrice = cartRes.reduce((sum: any, item: any) => {
+  const totalPrice = cartDetail.reduce((sum: any, item: any) => {
     return sum + item.price * item.quantity;
   }, 0);
 
   console.log("cart:",cart);
-  console.log("cartRes:",cartRes);
+  console.log("cartDetail:",cartDetail);
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -47,7 +47,7 @@ export default function CartPage() {
         <p>Your cart is empty</p>
       )} 
 
-      {cartRes.map((item: any) => (
+      {cartDetail.map((item: any) => (
         <div 
           key={item.productId}
           className="flex items-center justify-between border-b py-4"

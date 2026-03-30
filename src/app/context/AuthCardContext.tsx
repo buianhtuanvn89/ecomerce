@@ -29,6 +29,7 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
   const [user, setUser] = useState<UserInfo | null>(null);
   const [cart, setCart] = useState<CartInfo[]>([]);
 
+
   const addCartItem = async (productId:number) =>{
     await fetch(`/api/v1/carts/add?userName=${user?.userName}`,{
       method:"POST",
@@ -115,7 +116,7 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   return (
-    <AuthCardContext.Provider value={{ user, setUser, logout, cart, addToCart, setCart, addCartItem, removeCartItem }}>
+    <AuthCardContext.Provider value={{ user, setUser, logout, cart, addToCart, setCart, addCartItem, removeCartItem}}>
       {children}
     </AuthCardContext.Provider>
   );

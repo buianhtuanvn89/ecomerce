@@ -137,6 +137,10 @@ export default function CreateProductForm() {
     }
   };
 
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   // =============================
   // Render
   // =============================
@@ -274,15 +278,70 @@ export default function CreateProductForm() {
 
       {/* Images */}
       <div>
-
         <label>Images</label>
 
         <input
           type="file"
           multiple
           onChange={handleImageChange}
+          style={{ display: "none" }}
+          id="imageUpload"
         />
 
+        <label
+          htmlFor="imageUpload"
+          style={{
+            background: "#2563eb",
+            color: "white",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            display: "inline-block"
+          }}
+        >
+          Chọn ảnh
+        </label>
+
+        <div style={{ display: "flex", gap: "10px", marginTop: "10px", flexWrap: "wrap" }}>
+          {images.map((img, index) => (
+            <div
+              key={index}
+              style={{
+                position: "relative",
+                width: "120px"
+              }}
+            >
+              <img
+                src={URL.createObjectURL(img)}
+                style={{
+                  width: "120px",
+                  height: "120px",
+                  objectFit: "cover",
+                  borderRadius: "6px"
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                style={{
+                  position: "absolute",
+                  top: "5px",
+                  right: "5px",
+                  background: "red",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "24px",
+                  height: "24px",
+                  cursor: "pointer"
+                }}
+              >
+                X
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <button type="submit">Create Product</button>

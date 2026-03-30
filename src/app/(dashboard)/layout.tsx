@@ -9,10 +9,8 @@ export default function DashboardLayout({
   return (
     <div >
       <main >
-        <AuthCardProvider>
           <Header/>
           {children}
-        </AuthCardProvider>
       </main>
     </div>
   );
