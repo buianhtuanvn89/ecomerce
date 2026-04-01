@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 interface Category {
   id: number;
   categoryName: string;
+  parent : Category;
+  children : Category[];
 }
 
 interface Brand {
@@ -12,16 +15,34 @@ interface Brand {
   brandName: string;
 }
 
-export default function CreateProductForm() {
+interface ProductDetail {
+  productCode: string;
+  productName: string;
+  price: number;
+  gender: string;
+  brand: Brand;
+  category: Category;
+  thumbnail: string;
+  images : string[];
+}
+
+export default function EditProductForm() {
+
+  const params = useParams();
+  const id = params.id;
 
   const [productCode, setProductCode] = useState("");
   const [productName, setProductName] = useState("");
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState<number | null>(null);
 
   const [gender, setGender] = useState("");
 
   const [images, setImages] = useState<File[]>([]);
+  const [oldImages, setOldImages] = useState<string[]>([]);
+
   const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [oldThumbnail, setOldThumbnail] = useState<string | null >(null);
+
 
   const [parentCategories, setParentCategories] = useState<Category[]>([]);
   const [childCategories, setChildCategories] = useState<Category[]>([]);
@@ -32,64 +53,74 @@ export default function CreateProductForm() {
   const [brandId, setBrandId] = useState<number | null>(null);
 
   // =============================
-  // Load parent category
+  // Load categories + brands
   // =============================
   useEffect(() => {
+
     fetch("/api/v1/categories/parents")
-      .then((res) => res.json())
-      .then(setParentCategories)
-      .catch(console.error);
+      .then(res => res.json())
+      .then(setParentCategories);
+
+    fetch("/api/v1/brands")
+      .then(res => res.json())
+      .then(setBrands);
+
   }, []);
 
   // =============================
-  // Load brands
+  // Load product detail
   // =============================
   useEffect(() => {
-    fetch("/api/v1/brands")
-      .then((res) => res.json())
-      .then(setBrands)
-      .catch(console.error);
-  }, []);
+
+    if (!id) return;
+
+    fetch(`/api/v1/products/product-detail/${id}`)
+      .then(res => res.json())
+      .then((data: ProductDetail) => {
+
+        setProductCode(data.productCode);
+        setProductName(data.productName);
+        setPrice(data.price);
+
+        setGender(data.gender);
+
+        setBrandId(data.brand.id);
+        setParentId(data.category.parent.id);
+        setChildId(data.category.id);
+
+        setOldImages(data.images);
+        setOldThumbnail(data.thumbnail);
+
+      });
+
+  }, [id]);
+
+  // =============================
+  // Load child category
+  // =============================
+  useEffect(() => {
+
+    if (!parentId) return;
+
+    fetch(`/api/v1/categories/child/${parentId}`)
+      .then(res => res.json())
+      .then(setChildCategories);
+
+  }, [parentId]);
 
   // =============================
   // Parent change
   // =============================
   const handleParentChange = async (value: number | null) => {
-
-    setParentId(value);
+   
     setChildId(null);
     setChildCategories([]);
+    setParentId(value);
 
-    if (!value) return;
-
-    try {
-
-      const res = await fetch(`/api/v1/categories/child/${value}`);
-      const data = await res.json();
-
-      setChildCategories(Array.isArray(data) ? data : []);
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  }
 
   // =============================
-  // Child change
-  // =============================
-  const handleChildChange = (value: number | null) => {
-    setChildId(value);
-  };
-
-  // =============================
-  // Brand change
-  // =============================
-  const handleBrandChange = (value: number | null) => {
-    setBrandId(value);
-  };
-
-  // =============================
-  // Image upload
+  // Upload list images
   // =============================
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -100,20 +131,21 @@ export default function CreateProductForm() {
   };
 
   // =============================
-  // Thumbnail upload
+  // Upload thumbnail
   // =============================
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const file = e.target.files?.[0];
     if (!file) return;
+
     setThumbnail(file);
   };
 
   // =============================
-  // Handle images list
+  // Remove image
   // =============================
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+  const removeNewImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
   };
 
   // =============================
@@ -127,177 +159,78 @@ export default function CreateProductForm() {
 
     formData.append("productCode", productCode);
     formData.append("productName", productName);
-    formData.append("price", price);
+    formData.append("price", String(price));
     formData.append("gender", gender);
 
-    if (childId !== null) {
-      formData.append("categoryId", String(childId));
-    }
-
-    if (brandId !== null) {
-      formData.append("brandId", String(brandId));
-    }
+    if (childId !== null) formData.append("categoryId", String(childId));
+    if (brandId !== null) formData.append("brandId", String(brandId));
 
     if (images.length !== 0) images.forEach((img) => formData.append("images", img));
 
-    if (thumbnail) formData.append("thumbnail", thumbnail);
+    if (thumbnail) {
+      formData.append("thumbnail", thumbnail);
+    }
 
     try {
 
       const res = await fetch("/api/v1/products", {
-        method: "POST",
-        body: formData,
+        method: "PUT",
+        body: formData
       });
 
       if (!res.ok) throw new Error();
 
-      alert("Create product success");
+      alert("Update success");
 
     } catch {
-      alert("Create product failed");
-    }
-  };
-  
 
-  // =============================
-  // Render
-  // =============================
+      alert("Update failed");
+
+    }
+
+  };
+
   return (
+
     <form onSubmit={handleSubmit}>
 
-      <h2>Create Product</h2>
+      <h2>Edit Product</h2>
 
-      <div>
-        <label>Product Code</label>
-        <input
-          type="text"
-          value={productCode}
-          onChange={(e) => setProductCode(e.target.value)}
-        />
-      </div>
+      {/* Product Code */}
+      <input
+        value={productCode}
+        onChange={(e) => setProductCode(e.target.value)}
+      />
 
-      <div>
-        <label>Product Name</label>
-        <input
-          type="text"
-          value={productName}
-          onChange={(e) => setProductName(e.target.value)}
-        />
-      </div>
+      {/* Product Name */}
+      <input
+        value={productName}
+        onChange={(e) => setProductName(e.target.value)}
+      />
 
       {/* Price */}
-      <div>
-        <label>Price</label>
-        <input
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-      </div>
-
-      {/* Gender */}
-      <div>
-        <label>Gender</label>
-
-        <select
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
-        >
-
-          <option value="">Select gender</option>
-          <option value="BOY">Nam</option>
-          <option value="GIRL">Nữ</option>
-          <option value="UNISEX">Unisex</option>
-
-        </select>
-
-      </div>
-
-      {/* Brand */}
-      <div>
-
-        <label>Brand</label>
-
-        <select
-          value={brandId ?? ""}
-          onChange={(e) =>
-            handleBrandChange(
-              e.target.value ? Number(e.target.value) : null
-            )
-          }
-        >
-
-          <option value="">Select brand</option>
-
-          {brands.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.brandName}
-            </option>
-          ))}
-
-        </select>
-
-      </div>
-
-      {/* Parent Category */}
-      <div>
-
-        <label>Parent Category</label>
-
-        <select
-          value={parentId ?? ""}
-          onChange={(e) =>
-            handleParentChange(
-              e.target.value ? Number(e.target.value) : null
-            )
-          }
-        >
-
-          <option value="">Select parent category</option>
-
-          {parentCategories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.categoryName}
-            </option>
-          ))}
-
-        </select>
-
-      </div>
-
-      {/* Child Category */}
-      {(childCategories.length != 0) && (
-
-        <div>
-
-          <label>Child Category</label>
-
-          <select
-            value={childId ?? ""}
-            onChange={(e) =>
-              handleChildChange(
-                e.target.value ? Number(e.target.value) : null
-              )
-            }
-          >
-
-            <option value="">Select child category</option>
-
-            {childCategories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.categoryName}
-              </option>
-            ))}
-
-          </select>
-
-        </div>
-      )}
+      <input
+        type="number"
+        value={String(price)}
+        onChange={(e) => setPrice(Number(e.target.value))}
+      />
 
       {/* Images */}
-      <div>
-        <label>Images</label>
 
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        <p> Old images: </p>
+
+        {oldImages.map((img, index) => (
+
+          <div key={index} style={{ position: "relative" }}>
+
+            <img src={img} width={120} />
+
+          </div>
+
+        ))}
+
+        <p> New images: </p>
         <input
           type="file"
           multiple
@@ -341,7 +274,7 @@ export default function CreateProductForm() {
 
               <button
                 type="button"
-                onClick={() => removeImage(index)}
+                onClick={() => removeNewImage(index)}
                 style={{
                   position: "absolute",
                   top: "5px",
@@ -360,10 +293,20 @@ export default function CreateProductForm() {
             </div>
           ))}
         </div>
+
       </div>
 
+      {/* Thumbnail */}
+
+      {/* <input type="file" onChange={handleThumbnailChange} /> */}
+
       <div>
-        <label>Thumbnail</label>
+        <p>Old thumbnail:</p>  
+        {oldThumbnail && (
+          <img src={oldThumbnail} width={120} />
+        )}
+
+        <p>New thumbnail:</p>  
 
         <input
           type="file"
@@ -425,10 +368,12 @@ export default function CreateProductForm() {
             </div>
           }
         </div>
+
       </div>
 
-      <button type="submit">Create Product</button>
+      <button type="submit">Update Product</button>
 
     </form>
+
   );
 }
