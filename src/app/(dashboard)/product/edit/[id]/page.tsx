@@ -157,6 +157,8 @@ export default function EditProductForm() {
 
     const formData = new FormData();
 
+    formData.append("id", String(id));
+
     formData.append("productCode", productCode);
     formData.append("productName", productName);
     formData.append("price", String(price));
@@ -190,6 +192,8 @@ export default function EditProductForm() {
 
   };
 
+  console.log("thumb:",thumbnail)
+
   return (
 
     <form onSubmit={handleSubmit}>
@@ -211,24 +215,106 @@ export default function EditProductForm() {
       {/* Price */}
       <input
         type="number"
-        value={String(price)}
+        value={price ?? ""}
         onChange={(e) => setPrice(Number(e.target.value))}
       />
 
+      {/* Brand */}
+      <div>
+
+        <label>Brand</label>
+
+        <select
+          value={brandId ?? ""}
+          onChange={(e) =>
+            setBrandId(
+              e.target.value ? Number(e.target.value) : null
+            )
+          }
+        >
+
+          <option value="">Select brand</option>
+
+          {brands.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.brandName}
+            </option>
+          ))}
+
+        </select>
+
+      </div>
+
+      {/* Parent Category */}
+      <div>
+
+        <label>Parent Category</label>
+
+        <select
+          value={parentId ?? ""}
+          onChange={(e) =>
+            handleParentChange(
+              e.target.value ? Number(e.target.value) : null
+            )
+          }
+        >
+
+          <option value="">Select parent category</option>
+
+          {parentCategories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.categoryName}
+            </option>
+          ))}
+
+        </select>
+
+      </div>
+
+      {/* Child Category */}
+      {(childCategories.length != 0) && (
+
+        <div>
+
+          <label>Child Category</label>
+
+          <select
+            value={childId ?? ""}
+            onChange={(e) =>
+              setChildId(
+                e.target.value ? Number(e.target.value) : null
+              )
+            }
+          >
+
+            <option value="">Select child category</option>
+
+            {childCategories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.categoryName}
+              </option>
+            ))}
+
+          </select>
+
+        </div>
+      )}
+
       {/* Images */}
 
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
         <p> Old images: </p>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
 
-        {oldImages.map((img, index) => (
+          {oldImages.map((img, index) => (
 
-          <div key={index} style={{ position: "relative" }}>
+            <div key={index} style={{ position: "relative" }}>
 
-            <img src={img} width={120} />
+              <img src={img} width={120} />
 
-          </div>
+            </div>
+          ))}
+        </div>
 
-        ))}
 
         <p> New images: </p>
         <input
@@ -294,11 +380,8 @@ export default function EditProductForm() {
           ))}
         </div>
 
-      </div>
 
       {/* Thumbnail */}
-
-      {/* <input type="file" onChange={handleThumbnailChange} /> */}
 
       <div>
         <p>Old thumbnail:</p>  

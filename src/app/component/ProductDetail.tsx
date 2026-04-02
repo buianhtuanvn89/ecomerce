@@ -1,84 +1,80 @@
 "use client";
 
 import { useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Navigation } from "swiper/modules";
 
-type Gender = "BOY" | "GIRL" | "UNISEX";
-
-interface Category {
-  id: number;
-  categoryName: string;
-}
-
-interface Brand {
-  id: number;
-  brandName: string;
-}
-
-interface Product {
-  productName: string;
-  productCode: string;
-  price: number;
-  images: string[];
-  gender : Gender ;
-  category : Category;
-  brand : Brand;
-}
-
-export default function ProductDetail({ product }: { product: Product }) {
-  const [current, setCurrent] = useState(0);
+export default function ProductDetail({ product }: any) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   return (
-    <div className="container mt-5">
-
-      <div className="row">
-
-        {/* IMAGE */}
-        <div className="col-md-6">
-
-          {/* MAIN IMAGE */}
-          <img
-            src={product.images[current]}
-            className="img-fluid border"
-            style={{ width: "100%", height: "400px", objectFit: "cover" }}
-          />
-
-          {/* THUMBNAILS */}
-          <div className="d-flex mt-3 gap-2 overflow-auto">
-
-            {product.images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                onClick={() => setCurrent(index)}
-                style={{
-                  width: 80,
-                  height: 80,
-                  objectFit: "cover",
-                  cursor: "pointer",
-                  border:
-                    current === index
-                      ? "2px solid red"
-                      : "1px solid #ccc"
-                }}
-              />
-            ))}
-
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="grid grid-cols-2 gap-10">
+        
+        {/* 🔥 LEFT: IMAGE */}
+        <div>
+          {/* Ảnh lớn */}
+          <div className="mb-4 border rounded-xl overflow-hidden">
+            <img
+              src={product.images[selectedIndex]}
+              className="w-full h-[450px] object-cover"
+            />
           </div>
+
+          {/* Thumbnail */}
+          <Swiper 
+            slidesPerView={4} 
+            spaceBetween={10}
+            navigation
+            modules={[Navigation]}
+          >
+            {product.images.map((img: string, index: number) => (
+              <SwiperSlide key={index}>
+                <img
+                  src={img}
+                  onClick={() => setSelectedIndex(index)}
+                  className={`h-20 w-full object-cover rounded-lg cursor-pointer border-2
+                  ${
+                    selectedIndex === index
+                      ? "border-blue-500"
+                      : "border-gray-300"
+                  }`}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
 
-        {/* PRODUCT INFO */}
-        <div className="col-md-6">
+        {/* 🔥 RIGHT: PRODUCT INFO */}
+        <div>
+          <h1 className="text-2xl font-bold mb-4">
+            {product.productName}
+          </h1>
 
-          <h2>{product.productName}</h2>
-
-          <h3 className="text-danger">
-            {product.price.toLocaleString()} ¥
-          </h3>
-
-          <p>
-            <b>Brand:</b> {product.brand.brandName}
+          <p className="text-red-500 text-2xl font-semibold mb-4">
+            ¥ {product.price}
           </p>
 
+          <p className="mb-2">
+            <span className="font-semibold">Brand:</span>{" "}
+            {product.brand?.brandName}
+          </p>
+
+          <p className="mb-2">
+            <span className="font-semibold">Category:</span>{" "}
+            {product.category?.categoryName}
+          </p>
+
+          <p className="mt-4 text-gray-600">
+            {product.description}
+          </p>
+
+          {/* Button */}
+          <button className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+            Add to Cart
+          </button>
         </div>
 
       </div>
