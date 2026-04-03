@@ -5,10 +5,17 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from "swiper/modules";
+import { useAuthCard } from "../context/AuthCardContext";
 
 export default function ProductDetail({ product }: any) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const {cart,addToCart} = useAuthCard();
 
+  const isInCart = (id:number) => {
+  return cart.some((item:any) => item.productId === id);
+
+
+  };
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="grid grid-cols-2 gap-10">
@@ -72,9 +79,21 @@ export default function ProductDetail({ product }: any) {
           </p>
 
           {/* Button */}
-          <button className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-            Add to Cart
-          </button>
+          {isInCart(product.id) ? (
+            <button
+                onClick={() => addToCart(product.id)}
+                className="mt-3 w-full bg-red-500 text-white py-2 rounded"
+            >
+                Remove from Cart
+            </button>
+            ) : (
+            <button
+                onClick={() => addToCart(product.id)}
+                className="mt-3 w-full bg-blue-500 text-white py-2 rounded"
+            >
+                Add to Cart
+            </button>
+            )}
         </div>
 
       </div>

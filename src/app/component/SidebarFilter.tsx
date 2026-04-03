@@ -5,6 +5,7 @@ import GenderFilter from "./GenderFilter";
 import BrandFilter from "./BrandFilter";
 import PriceFilter from "./PriceFilter";
 import CategorySidebar from "./CategorySidebar";
+import AgeFilter from "./AgeFilter";
 
 export default function SidebarFilter() {
 
@@ -39,6 +40,11 @@ export default function SidebarFilter() {
       <BrandFilter
         selected={searchParams.getAll("brandIds")}
         onChange={(v) => updateFilter("brandIds", v)}
+      />
+
+      <AgeFilter
+        selected={searchParams.getAll("ageRange")}
+        onChange={(v) => updateFilter("ageRange", v)}
       />
 
     </div>

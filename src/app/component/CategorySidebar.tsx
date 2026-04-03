@@ -29,7 +29,6 @@ export default function CategorySidebar() {
 
   const parents = categories.filter((c) => c.parent === null);
   const children = categories.filter((c) => c.parent !== null);
-   console.log(children,"fddff")
 
   return (
     <div className="w-64 p-4 border">
@@ -38,7 +37,7 @@ export default function CategorySidebar() {
           
           {/* category tầng 1 */}
           <Link
-            href={`/product/category/${parent.id}`}
+            href={`/product?categoryId=${parent.id}`}
             className="text-gray-600 hover:text-black"
           >
             {parent.categoryName}
@@ -51,7 +50,7 @@ export default function CategorySidebar() {
               .map((child) => (
                 <span key={child.id}>
                   <Link
-                    href={`/product/category/${child.id}`}
+                    href={`/product?categoryId=${child.id}`}
                     className="text-gray-600 hover:text-black"
                   >
                     {child.categoryName}

@@ -3,14 +3,15 @@ type Props = {
   onChange: (values: string[]) => void;
 };
 
-const priceOptions = [
-  { label: "0 - 100", value: "0-100" },
-  { label: "100 - 200", value: "100-200" },
-  { label: "200 - 500", value: "200-500" },
-  { label: "500+", value: "500-10000000" }
+const ageOptions = [
+    { label: "0 - 1", value: "0-1" },
+    { label: "1 - 3", value: "1-3" },
+    { label: "3 - 6", value: "3-6" },
+    { label: "6 - 12", value: "6-12" },
+    { label: "12+", value: "12+" }
 ];
 
-export default function PriceFilter({ selected, onChange }: Props) {
+export default function AgeFilter({ selected, onChange }: Props) {
 
   const toggle = (value: string) => {
 
@@ -21,7 +22,6 @@ export default function PriceFilter({ selected, onChange }: Props) {
     } else {
       newValues = [...selected, value];
     }
-
     onChange(newValues);
   };
 
@@ -29,14 +29,14 @@ export default function PriceFilter({ selected, onChange }: Props) {
     <div>
       <h3>Price</h3>
 
-      {priceOptions.map(p => (
-        <label key={p.value} style={{ display: "block" }}>
+      {ageOptions.map(a => (
+        <label key={a.value} style={{ display: "block" }}>
           <input
             type="checkbox"
-            checked={selected.includes(p.value)}
-            onChange={() => toggle(p.value)}
+            checked={selected.includes(a.value)}
+            onChange={() => toggle(a.value)}
           />
-          {p.label}
+          {a.label}
         </label>
       ))}
     </div>

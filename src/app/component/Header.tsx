@@ -5,6 +5,7 @@ import Login from "./Login";
 import { useAuthCard } from "../context/AuthCardContext";
 import { useRouter } from "next/navigation";
 import SearchBar from "./SearchBar";
+import Link from "next/link";
 
 
 export default function Header() {
@@ -32,7 +33,9 @@ export default function Header() {
           borderBottom: "1px solid #ddd",
         }}
       >
-        <h2>MyApp</h2>
+        <Link href={"/"}>
+          <h2>MyApp</h2>
+        </Link>
         <div>
           {user ? (
             <div

@@ -31,6 +31,11 @@ export default function CreateProductForm() {
   const [childId, setChildId] = useState<number | null>(null);
   const [brandId, setBrandId] = useState<number | null>(null);
 
+  const [salePrice, setSalePrice] = useState<number | "">("");
+  const [saleStartDate, setSaleStartDate] = useState("");
+  const [saleEndDate, setSaleEndDate] = useState("");
+  const [ageRange, setAgeRange] = useState("");
+
   // =============================
   // Load parent category
   // =============================
@@ -141,6 +146,11 @@ export default function CreateProductForm() {
     if (images.length !== 0) images.forEach((img) => formData.append("images", img));
 
     if (thumbnail) formData.append("thumbnail", thumbnail);
+
+    formData.append("salePrice", salePrice ? salePrice.toString() : "");
+    formData.append("saleStartDate", saleStartDate);
+    formData.append("saleEndDate", saleEndDate);
+    formData.append("ageRange", ageRange);
 
     try {
 
@@ -425,6 +435,53 @@ export default function CreateProductForm() {
             </div>
           }
         </div>
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Sale Price</label>
+        <input
+          type="number"
+          className="form-control"
+          value={salePrice}
+          onChange={(e) => setSalePrice(e.target.value ? Number(e.target.value) : "")}
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Sale Start Date</label>
+        <input
+          type="datetime-local"
+          className="form-control"
+          value={saleStartDate}
+          onChange={(e) => setSaleStartDate(e.target.value)}
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Sale End Date</label>
+        <input
+          type="datetime-local"
+          className="form-control"
+          value={saleEndDate}
+          onChange={(e) => setSaleEndDate(e.target.value)}
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Age Range</label>
+        <select
+          className="form-control"
+          value={ageRange}
+          onChange={(e) => setAgeRange(e.target.value)}
+        >
+          <option value="">-- Select Age Range --</option>
+          <option value="0-1">0 - 1</option>
+          <option value="1-3">1 - 3</option>
+          <option value="3-6">3 - 6</option>
+          <option value="6-12">6 - 12</option>
+          <option value="12+">12+</option>
+
+        </select>
       </div>
 
       <button type="submit">Create Product</button>

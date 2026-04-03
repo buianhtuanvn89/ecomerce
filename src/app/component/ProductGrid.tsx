@@ -8,7 +8,6 @@ export default function ProductGrid({ products }:{products : any[]}) {
   const isInCart = (id:number) => {
     return cart.some((item:any) => item.productId === id);
   };
-  console.log(cart);
   return (
    
         <div className="grid grid-cols-3 gap-6">
@@ -21,7 +20,7 @@ export default function ProductGrid({ products }:{products : any[]}) {
                         className="border rounded-lg p-4 shadow hover:shadow-md"
                     >
                         <img
-                        src="https://picsum.photos/300/200"
+                        src={product.thumbnail}
                         className="w-full h-40 object-cover mb-3"
                         />
 

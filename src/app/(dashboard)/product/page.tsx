@@ -3,9 +3,6 @@ import SidebarFilter from "@/app/component/SidebarFilter"
 import SortDropdown from "@/app/component/SortDropdown"
 
 type Props = {
-   params: {
-    categoryId: string
-  }
   searchParams: {
     q?: string
     genders?: string | string[]
@@ -21,26 +18,23 @@ async function getProducts(params: String) {
       cache: "no-store",
     }
   );
-
+  
   return res.json();
 }
 
-export default async function Page({params, searchParams }: Props) {
-  const { categoryId } = await params;
+export default async function Page({searchParams }: Props) {
   const queryParams  = new URLSearchParams();
   const paramsObj = await searchParams;
 
     Object.entries(paramsObj).forEach(([key, value]) => {
 
       if (Array.isArray(value)) {
-        value.forEach(v => queryParams .append(key, v));
+        value.forEach(v => queryParams.append(key, v));
       } else if (value) {
         queryParams .append(key, value);
       }
-
     });
     
-  queryParams.append("categoryId", categoryId);
   const query = queryParams .toString();
   const productsPage = await getProducts(query);
   const products = productsPage.content;
