@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 type Category = {
   id: number;
@@ -8,11 +9,16 @@ type Category = {
   logo: string;
 };
 
-export default function CategorySetion({
-  categories,
-}: {
-  categories: Category[];
-}) {
+export default function CategorySetion(){
+  const [categories, setCategories] = useState<Category[]>([]);
+  
+    useEffect(() => {
+      fetch("/api/v1/categories/parents")
+        .then((res) => res.json())
+        .then((data) => setCategories(data))
+        .catch((err) => console.error(err));
+    }, []);
+    
   return (
     <div className="flex flex-row flex-nowrap overflow-auto gap-3">
       {categories.map((c) => (

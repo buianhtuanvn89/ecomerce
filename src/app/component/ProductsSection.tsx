@@ -9,7 +9,7 @@ type Product = {
   thumbnail: string;
 };
 
-export default function NewProductsSection({ products }: { products: Product[] }) {
+export default function ProductsSection({ products }: { products: Product[] }) {
   return (
     <div className="flex flex-row flex-nowrap overflow-auto gap-3">
       {products.map((p) => (
@@ -41,6 +41,10 @@ export default function NewProductsSection({ products }: { products: Product[] }
 
                 <div className="fw-bold text-danger">
                   ¥{p.price}
+                </div>
+
+                <div className="fw-bold text-danger">
+                  ¥{p.id}
                 </div>
               </div>
             </div>
