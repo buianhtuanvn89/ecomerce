@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthCard } from "@/app/context/AuthCardContext";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function CartPage() {
@@ -162,6 +163,14 @@ export default function CartPage() {
       <div className="text-right mt-6 text-xl font-bold">
         Total: {totalPrice} ¥
       </div>
+
+      <Link href={"/user/user-auth"}>
+        <div>
+          <button>
+            Xac thuc user
+          </button>
+        </div>
+      </Link>
 
     </div>
   );

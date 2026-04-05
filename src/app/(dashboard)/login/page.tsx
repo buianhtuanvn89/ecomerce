@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useAuthCard } from "@/app/context/AuthCardContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Login() {
   const { user, setUser, cart, setCart } = useAuthCard();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -74,11 +75,13 @@ export default function Login() {
       if (!user) {
         pushAndGetCart(result.data.userName);
         setUser(userInfo);
-        router.push("/cart")
+        router.push(`${searchParams.get("redirect")}`)
       } else {
-        router.push("/user")
-
+        router.push(`${searchParams.get("redirect")}`)
       }
+     
+
+      
 
       // window.location.reload();
     

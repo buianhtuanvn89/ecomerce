@@ -56,7 +56,7 @@ export default function HomePage() {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ role, refreshToken }),
                     })
-                        .then(res => res.ok ? res.json() : router.push("/login"))
+                        .then(res => res.ok ? res.json() : router.push("/login?redirect=/user/user-auth"))
                         .then(result => {
                             if (result) {
                             localStorage.setItem("accessToken", result.data.accessToken);
@@ -70,7 +70,7 @@ export default function HomePage() {
                             .catch(err => console.error("Fetch by access token failed:", err));
                 });
             } else {
-            router.push("/login")
+            router.push("/login?redirect=/cart")
         }
     }, []);
 
@@ -90,30 +90,28 @@ export default function HomePage() {
             }).then(res => {if (!res.ok) throw res});
         };
 
-        if (token) {
-            fetchUsers(token!)
-                .then(() => router.push("/order-success"))
-                .catch(() => {
-                    fetch("/api/v1/auth/refreshtoken", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ role, refreshToken }),
+        
+        fetchUsers(token!)
+            .then(() => router.push("/order-success"))
+            .catch(() => {
+                fetch("/api/v1/auth/refreshtoken", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ role, refreshToken }),
+                })
+                    .then(res => res.ok ? res.json() : router.push("/login?redirect=/user/user-auth"))
+                    .then(result => {
+                        if (result) {
+                        localStorage.setItem("accessToken", result.data.accessToken);
+                        localStorage.setItem("refreshToken", result.data.refreshToken);
+                        // Gọi lại fetch user sau khi refresh
+                        return fetchUsers(result.data.accessToken);
+                        }
                     })
-                        .then(res => res.ok ? res.json() : router.push("/login"))
-                        .then(result => {
-                            if (result) {
-                            localStorage.setItem("accessToken", result.data.accessToken);
-                            localStorage.setItem("refreshToken", result.data.refreshToken);
-                            // Gọi lại fetch user sau khi refresh
-                            return fetchUsers(result.data.accessToken);
-                            }
-                        })
-                            .then(() => router.push("/order-success"))
-                            .catch(err => console.error("Fetch by access token failed:", err));
-                });
-            } else {
-            router.push("/login")
-        }
+                        // .then(() => router.push("/order-success"))
+                        .catch(err => console.error("Fetch by access token failed:", err));
+            });
+            
     }
 
     console.log("cart:",cart);
