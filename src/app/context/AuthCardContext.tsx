@@ -21,6 +21,8 @@ interface AuthCardContextType {
   addToCart : (id: number) => void;
   addCartItem : (productId:number) => void;
   removeCartItem: (productId:number, removeType:boolean) => void;
+  wishList : number[];
+  handleWishList : (id: number) => void;
 }
 
 const AuthCardContext = createContext<AuthCardContextType | undefined>(undefined);
@@ -28,7 +30,7 @@ const AuthCardContext = createContext<AuthCardContextType | undefined>(undefined
 export const AuthCardProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [cart, setCart] = useState<CartInfo[]>([]);
-
+  const [wishList, setWishList] = useState<number[]>([]);
 
   const addCartItem = async (productId:number) =>{
     await fetch(`/api/v1/carts/add?userName=${user?.userName}`,{
@@ -64,12 +66,35 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
     })
   }
 
+  const addWishListItem = async (productId:number) =>{
+    await fetch(`/api/v1/wish-list/${productId}?userName=${user?.userName}`,{
+      method:"POST",
+      headers: {
+          "Content-Type": "application/json",
+        },
+    })
+  }
+
+   const removeWishListItem = async (productId:number) =>{
+    await fetch(`/api/v1/wish-list/${productId}?userName=${user?.userName}`,{
+      method:"DELETE",
+      headers: {
+          "Content-Type": "application/json",
+        },
+    })
+  }
+
   const getCart = async (userName : string) => {
     const res = await fetch(`/api/v1/carts?userName=${userName}`)
     const localCart = await res.json();
     setCart(localCart);
   }
 
+   const getWishList = async (userName : string) => {
+    const res = await fetch(`/api/v1/wish-list?userName=${userName}`)
+    const localWishList = await res.json();
+    setWishList(localWishList);
+  }
 
   useEffect(() => {
       const storedUser = localStorage.getItem("user");
@@ -78,9 +103,14 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
         if (localCart) {
           setCart(JSON.parse(localCart));
         }
+        const localWishList = localStorage.getItem("wishList");
+        if (localWishList) {
+          setWishList(JSON.parse(localWishList));
+        }
       } else {
         getCart(JSON.parse(storedUser).userName);
         setUser(JSON.parse(storedUser));
+        getWishList(JSON.parse(storedUser).userName);
       }
   }, []);
 
@@ -107,6 +137,29 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
+  const handleWishList = (id: number) => {
+    const newList = [...wishList];
+    const index = newList.findIndex(i => i === id);
+
+    if (index >= 0) {
+      const updateList = newList.filter(i => i !== id);
+      setWishList(updateList);
+      if (!user) 
+        {localStorage.setItem("wishList", JSON.stringify(updateList))}
+        else {
+          removeWishListItem(id);
+        }
+    } else {
+      newList.push(id);
+      setWishList(newList);
+      if (!user) 
+        {localStorage.setItem("wishList", JSON.stringify(newList))}
+        else {
+          addWishListItem(id);
+        }
+    }
+  }
+
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
@@ -116,7 +169,8 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   return (
-    <AuthCardContext.Provider value={{ user, setUser, logout, cart, addToCart, setCart, addCartItem, removeCartItem}}>
+    <AuthCardContext.Provider value={{ user, setUser, logout, cart, wishList, handleWishList,
+                                        addToCart, setCart, addCartItem, removeCartItem}}>
       {children}
     </AuthCardContext.Provider>
   );
