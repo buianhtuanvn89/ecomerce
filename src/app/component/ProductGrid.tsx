@@ -3,17 +3,19 @@
 import { useAuthCard } from "../context/AuthCardContext";
 
 export default function ProductGrid({ products }:{products : any[]}) {
-  const { cart, addToCart } = useAuthCard();
+  const { cart, addToCart, wishList, handleWishList } = useAuthCard();
 
-  const isInCart = (id:number) => {
+  const inCart = (id:number) => {
     return cart.some((item:any) => item.productId === id);
   };
+  const inWishlist = (id:number) => {
+    return wishList.some((item) => item === id);
+  }
+  console.log(wishList);
   return (
    
         <div className="grid grid-cols-3 gap-6">
             {products.slice(0,12).map((product) => {
-                const inCart = isInCart(product.id);
-
                 return (
                     <div
                         key={product.id}
@@ -27,7 +29,15 @@ export default function ProductGrid({ products }:{products : any[]}) {
                         <h2 className="font-semibold">{product.productName}</h2>
                         <p className="text-gray-600">{product.price} ¥</p>
                         <p className="text-gray-600">ID:{product.id} </p>
-                        {inCart ? (
+                        <button
+                            onClick={() => handleWishList(product.id)}
+                            className="absolute top-2 right-2 text-xl"
+                            >
+                            <span style={{ color: inWishlist(product.id) ? "red" : "gray" }}>
+                                ♥
+                            </span>
+                        </button>
+                        {inCart(product.id) ? (
                         <button
                             onClick={() => addToCart(product.id)}
                             className="mt-3 w-full bg-red-500 text-white py-2 rounded"
@@ -41,7 +51,9 @@ export default function ProductGrid({ products }:{products : any[]}) {
                         >
                             Add to Cart
                         </button>
+                        
                         )}
+                        
                     </div>
                 );
             })}

@@ -23,11 +23,13 @@ interface AuthCardContextType {
   removeCartItem: (productId:number, removeType:boolean) => void;
   wishList : number[];
   handleWishList : (id: number) => void;
+  setWishList : (wishList: number[]) => void;
 }
 
 const AuthCardContext = createContext<AuthCardContextType | undefined>(undefined);
 
 export const AuthCardProvider = ({ children }: { children: React.ReactNode }) => {
+  console.log("usecontext rerender")
   const [user, setUser] = useState<UserInfo | null>(null);
   const [cart, setCart] = useState<CartInfo[]>([]);
   const [wishList, setWishList] = useState<number[]>([]);
@@ -92,7 +94,10 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
 
    const getWishList = async (userName : string) => {
     const res = await fetch(`/api/v1/wish-list?userName=${userName}`)
-    const localWishList = await res.json();
+    const result = await res.json();
+    const localWishList = Array.isArray(result)
+            ? result.map((r: any) => r.productId)
+            : [];    
     setWishList(localWishList);
   }
 
@@ -166,11 +171,12 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
     localStorage.removeItem("refreshToken");
     setUser(null);
     setCart([]);
+    setWishList([]);
   };
 
   return (
     <AuthCardContext.Provider value={{ user, setUser, logout, cart, wishList, handleWishList,
-                                        addToCart, setCart, addCartItem, removeCartItem}}>
+                                        addToCart, setCart, addCartItem, removeCartItem, setWishList}}>
       {children}
     </AuthCardContext.Provider>
   );

@@ -9,6 +9,7 @@ interface LoginProps {
  
 export default function Login({ onClose }: LoginProps) {
   const { setUser, cart, setCart } = useAuthCard();
+  const {wishList, setWishList} =useAuthCard();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +30,6 @@ export default function Login({ onClose }: LoginProps) {
           ),   
       })
       localStorage.removeItem("cart");
-
     }
 
     const getRes = await fetch(`/api/v1/carts?userName=${userName}`);
@@ -37,6 +37,26 @@ export default function Login({ onClose }: LoginProps) {
       const localCart = await getRes.json();
       setCart(localCart);
     }
+  }
+
+   const pushAndGetWishList = async (userName : string) =>{
+    if (wishList.length !=0 ) {
+      await fetch(`/api/v1/wish-list/async-wish-list?userName=${userName}`,{
+        method:"POST",
+        headers: {
+            "Content-Type": "application/json",
+          },
+        body: JSON.stringify(wishList)
+      })
+      localStorage.removeItem("wishList");
+    }
+
+    const res = await fetch(`/api/v1/wish-list?userName=${userName}`)
+    const result = await res.json();
+    const localWishList = Array.isArray(result)
+            ? result.map((r: any) => r.productId)
+            : [];    
+    setWishList(localWishList);
   }
 
   const handleLogin = async () => {
@@ -75,6 +95,7 @@ export default function Login({ onClose }: LoginProps) {
       // 🔥 Update context
       setUser(userInfo);
       pushAndGetCart(result.data.userName);
+      pushAndGetWishList(result.data.userName);
 
       // 🔥 Đóng modal
       onClose();

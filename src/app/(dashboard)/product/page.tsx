@@ -1,3 +1,4 @@
+import ProductGrid from "@/app/component/ProductGrid"
 import ProductPagination from "@/app/component/ProductPagination"
 import SidebarFilter from "@/app/component/SidebarFilter"
 import SortDropdown from "@/app/component/SortDropdown"
@@ -45,12 +46,7 @@ export default async function Page({searchParams }: Props) {
       <SortDropdown/>
       <h1>Product List</h1>
 
-      {products.map((p: any) => (
-        <div key={p.id}>
-          <p>Name: {p.productName}</p>
-          <p>Price: {p.price}</p>
-        </div>
-      ))}
+      <ProductGrid products = {products}/>
 
        <ProductPagination
         totalElement={productsPage.totalElements}
