@@ -20,7 +20,7 @@ export default function OrderSearch() {
   return (
     <input
       placeholder="Search by username..."
-      defaultValue={searchParams.get("search") || ""}
+      defaultValue={searchParams.get("query") || ""}
       onChange={(e) => handleSearch(e.target.value)}
     />
   );

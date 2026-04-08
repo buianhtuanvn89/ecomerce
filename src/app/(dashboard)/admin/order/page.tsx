@@ -9,7 +9,7 @@ import OrderGrid from "@/app/component/OrderGrid";
 import DataPagination from "@/app/component/DataPagination";
 
 type Order = {
-  id: number;
+  orderId: number;
   userName: string;
   totalPrice: number;
   status: string;
@@ -32,24 +32,36 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     setLoading(true);
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/orders?${searchParams.toString()}`
-    );
+    try {
 
-    const data = await res.json();
-    setOrdersPage(data);
+      const res = await fetch(
+        `/api/v1/orders?${searchParams.toString()}`
+      );
 
-    setLoading(false);
+      if(!res.ok) throw new Error("Fetch failed")
+
+      const data = await res.json();
+      setOrdersPage(data);
+      setLoading(false);
+    }
+    catch (err) {
+      console.log(err);
+    }
   };
 
-  const queryString = searchParams.toString();
+  const status = searchParams.get("status");
+  const page = searchParams.get("page");
+  const sort = searchParams.get("sort");
+  const query = searchParams.get("query");
+
+
 
     useEffect(() => {
         fetchOrders();
-        }, [queryString]);
+        }, [status, page, sort, query]);
 
   if (loading || !ordersPage) return <p>Loading...</p>;
-
+  console.log(ordersPage)
   return (
     <div>
       <h1>Order Management</h1>
