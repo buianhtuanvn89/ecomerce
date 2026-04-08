@@ -9,7 +9,7 @@ type Props = {
   page: number;
 };
 
-export default function ProductPagination({ totalElement, size, page }: Props) {
+export default function DataPagination({ totalElement, size, page }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

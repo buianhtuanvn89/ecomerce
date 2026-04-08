@@ -1,7 +1,8 @@
 import ProductGrid from "@/app/component/ProductGrid"
-import ProductPagination from "@/app/component/ProductPagination"
+import ProductPagination from "@/app/component/DataPagination"
 import SidebarFilter from "@/app/component/SidebarFilter"
 import SortDropdown from "@/app/component/SortDropdown"
+import DataPagination from "@/app/component/DataPagination"
 
 type Props = {
   searchParams: {
@@ -48,7 +49,7 @@ export default async function Page({searchParams }: Props) {
 
       <ProductGrid products = {products}/>
 
-       <ProductPagination
+       <DataPagination
         totalElement={productsPage.totalElements}
         size={productsPage.size}
         page={productsPage.number}

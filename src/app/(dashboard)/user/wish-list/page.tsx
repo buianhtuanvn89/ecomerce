@@ -11,10 +11,10 @@ type WishListItem = {
 };
 
 export default function WishListPage() {
-  const [wishList, setWishList] = useState<WishListItem[]>([]);
+  const [wishListClient, setWishListClient] = useState<WishListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const {user} = useAuthCard();
+  const {user,handleWishList,wishList} = useAuthCard();
 
   const fetchWishList = async () => {
     try {
@@ -23,10 +23,10 @@ export default function WishListPage() {
       );
       const data = await res.json();
 
-      setWishList(Array.isArray(data) ? data : []);
+      setWishListClient(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Lỗi load wishlist", error);
-      setWishList([]);
+      setWishListClient([]);
     } finally {
       setLoading(false);
     }
@@ -39,27 +39,27 @@ export default function WishListPage() {
   }, [user]);
 
   const handleRemove = async (productId: number) => {
-    await fetch(`/api/v1/wish-list/${productId}?userName=${user?.userName}`, {
-      method: "DELETE",
-    });
+    handleWishList(productId);
 
     // update UI luôn (không cần reload)
-    setWishList((prev) =>
+    setWishListClient((prev) =>
       prev.filter((item) => item.productId !== productId)
     );
   };
 
   if (loading) return <p>Loading...</p>;
+    console.log(wishList);
+
 
   return (
     <div className="container mt-4">
       <h2>❤️ Wishlist của bạn</h2>
 
-      {wishList.length === 0 ? (
+      {wishListClient.length === 0 ? (
         <p>Chưa có sản phẩm nào</p>
       ) : (
         <div className="row">
-          {wishList.map((item) => (
+          {wishListClient.map((item) => (
             <div className="col-md-3 mb-4" key={item.productId}>
               <div className="card h-100 shadow-sm">
                 <img

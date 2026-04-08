@@ -71,18 +71,12 @@ export const AuthCardProvider = ({ children }: { children: React.ReactNode }) =>
   const addWishListItem = async (productId:number) =>{
     await fetch(`/api/v1/wish-list/${productId}?userName=${user?.userName}`,{
       method:"POST",
-      headers: {
-          "Content-Type": "application/json",
-        },
     })
   }
 
    const removeWishListItem = async (productId:number) =>{
     await fetch(`/api/v1/wish-list/${productId}?userName=${user?.userName}`,{
       method:"DELETE",
-      headers: {
-          "Content-Type": "application/json",
-        },
     })
   }
 
